@@ -1,6 +1,6 @@
 // @flow
 
-import { copyArray } from '../../utils/array';
+import cloneDeep from 'lodash.clonedeep';
 
 import {
     minAliveNeighboursCount,
@@ -13,12 +13,11 @@ import type { BoardArray, BoardServiceParams } from './types';
 export class BoardService {
     size: number;
     board: BoardArray;
-    prevBoard: BoardArray;
 
     constructor({ size, data = [] }: BoardServiceParams = {}) {
         if (data.length) {
             this.size = data.length;
-            this.board = copyArray(data);
+            this.board = cloneDeep(data);
         } else {
             this.size = size || boardDefaultSize;
             this.initBoard();
@@ -38,15 +37,18 @@ export class BoardService {
     }
 
     calculateNextTick(): void {
-        this.prevBoard = copyArray(this.board);
+        const board = cloneDeep(this.board);
 
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size; j++) {
-                const neighboursCount: number = this.countCellNeighbors(this.prevBoard, i, j);
+                const neighboursCount: number = this.countCellNeighbors(this.board, i, j);
                 const cell: number = this.board[i][j];
-                this.board[i][j] = this.getCellState(neighboursCount, cell);
+                board[i][j] = this.getCellState(neighboursCount, cell);
             }
         }
+
+        this.board = board;
+        return board;
     }
 
     getCellState(aliveNeighbours: number, cell: number): number {
@@ -54,11 +56,10 @@ export class BoardService {
             return (cell && (aliveNeighbours < minAliveNeighboursCount || aliveNeighbours > maxAliveNeighboursCount))
                 ? 0
                 : cell;
-        } else {
-            return aliveNeighbours === reproductionNeighboursCount
-                ? 1
-                : cell;
         }
+        return aliveNeighbours === reproductionNeighboursCount
+            ? 1
+            : cell;
     }
 
     countCellNeighbors(board: BoardArray, x: number, y: number): number {

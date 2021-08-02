@@ -1,30 +1,26 @@
 // @flow
 
 import { useState, useEffect } from 'react';
+import cloneDeep from 'lodash.clonedeep';
 
 import { BoardService } from '../../services/BoardService/BoardService';
-import { copyArray } from "../../utils/array";
 import { tickInterval } from './constants';
 import type { BoardArray } from '../../services/BoardService/types';
 
 export const useBoard: () => { board: BoardArray } = () => {
-    const boardInstance: BoardService = new BoardService();
     const [ board, setBoard ] = useState<BoardArray>([]);
 
     useEffect((): void => {
+        const boardInstance: BoardService = new BoardService();
         boardInstance.setRandomCells();
-        setBoard(copyArray(boardInstance.board))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
-    useEffect((): () => void => {
+        setBoard(cloneDeep(boardInstance.board));
+
         const timer: IntervalID = setInterval(() => {
-            boardInstance.calculateNextTick();
-            setBoard(copyArray(boardInstance.board))
+            setBoard(boardInstance.calculateNextTick())
         }, tickInterval);
 
         return () => clearInterval(timer);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return {

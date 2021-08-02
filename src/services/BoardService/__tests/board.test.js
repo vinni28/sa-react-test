@@ -83,4 +83,34 @@ describe('Board controller tests', () => {
             [0, 0, 0, 0, 0]
         ]));
     });
+
+    it('Checks 4 ticks result', () => {
+        // Arrange
+        const initialData: BoardArray = [
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 0, 0, 0]
+        ];
+
+        // Act
+        const boardInstance: BoardService = new BoardService({
+            data: initialData
+        });
+        boardInstance.calculateNextTick();
+        boardInstance.calculateNextTick();
+        boardInstance.calculateNextTick();
+        boardInstance.calculateNextTick();
+        const result: BoardArray = boardInstance.board;
+
+        // Assert
+        expect(JSON.stringify(result)).toEqual(JSON.stringify([
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 1],
+            [0, 0, 1, 1, 1]
+        ]));
+    });
 });

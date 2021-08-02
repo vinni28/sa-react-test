@@ -10,12 +10,12 @@ const Board = () => {
     return (
         <table>
             <tbody>
-            { board.map((row) => {
+            { board.map((row, i) => {
                 return (
                     <tr key={uuid()}>
-                        { row.map((cell) => {
+                        { row.map((cell, j) => {
                            return (
-                               <td key={uuid()} style={{ backgroundColor: cell && 'black' }} />
+                               <td key={`${i}.${j}`} style={{ backgroundColor: cell && 'black' }} />
                            )
                         })}
                     </tr>
